@@ -1,0 +1,5 @@
+﻿enum TransferOrder
+{
+    Load,
+    Unload
+}
