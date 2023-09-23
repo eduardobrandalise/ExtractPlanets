@@ -1,6 +1,6 @@
 public enum CargoShipState
 {
-    GoingToBasePlanet,
+    GoingToHomePlanet,
     Loading,
     GoingToEarth,
     Unloading

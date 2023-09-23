@@ -72,7 +72,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_Sprite: {fileID: 21300000, guid: 81ab4a0d29416dc40a089a62a929a852, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -93,7 +93,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7399388554071908992}
-  - component: {fileID: 8119995838081179362}
+  - component: {fileID: 4846109370199445139}
   m_Layer: 0
   m_Name: CargoShip
   m_TagString: Untagged
@@ -118,7 +118,7 @@ Transform:
   - {fileID: 4920810733357583924}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8119995838081179362
+--- !u!114 &4846109370199445139
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -130,13 +130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a88dea838b65a9448b3995601b33d854, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  finishedLoadingCargo:
-    m_PersistentCalls:
-      m_Calls: []
   cargoShipSprite: {fileID: 1834763265874607705}
-  cargoLimit: 0
-  transferSpeed: 0
-  travelSpeed: 5
   stoppingDistance: 0.4
 --- !u!1 &7748982549786942785
 GameObject:

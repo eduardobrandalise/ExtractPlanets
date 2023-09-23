@@ -52,7 +52,7 @@ public class InputManager : MonoBehaviour
             // The hit.collider variable contains the clicked object's Collider2D
             GameObject selectedObject = hit.collider.gameObject;
 
-            selectedObject.GetComponent<Planet>().OnClick();
+            selectedObject.GetComponent<Planet>().Clicked();
             // You can perform actions on the clicked object here
             selected.Invoke(selectedObject);
             

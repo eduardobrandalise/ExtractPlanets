@@ -7,34 +7,30 @@ using Branda.Utils;
 
 public class CargoShip : MonoBehaviour, IHasProgress
 {
-    public UnityEvent<float> finishedLoadingCargo;
-    
     public event EventHandler<IHasProgress.OnProgressChangedEventArgs> OnProgressChanged;
 
     [SerializeField] private SpriteRenderer cargoShipSprite;
-    [SerializeField] private float transferSpeed;
-    [SerializeField] private float travelSpeed = 10f;
-    [SerializeField] private float stoppingDistance = 0.1f;
+    [SerializeField] private float stoppingDistance = 0.4f;
 
     public CargoShipState CurrentState { get; private set; }
 
     private Vector3 _currentPosition;
-    private Planet _basePlanet;
+    private Planet _homePlanet;
     private Earth _earth;
     private BalanceManager _balanceManager;
-    private Planet _currentDestinationPlanet;
+    private BasePlanet _currentDestinationPlanet;
+    private float _travelSpeed;
     private float _transferTime;
     private float _transferTimer = 0f;
-    private float _cargoTransferSpeed;
     private bool _isCurrentDestinationNull;
 
     private void Start()
     {
-        _isCurrentDestinationNull = _basePlanet == null;
+        _isCurrentDestinationNull = _homePlanet == null;
         _earth = Earth.Instance;
         _balanceManager = BalanceManager.Instance;
         
-        _basePlanet.cargoTransferSpeedUpdated.AddListener(UpdateTransferTime);
+        // _basePlanet.cargoTransferSpeedUpdated.AddListener(UpdateTransferTime);
         // CurrentState = CargoShipState.GoingToBasePlanet;
         // SetDestination(_basePlanet);
     }
@@ -44,17 +40,17 @@ public class CargoShip : MonoBehaviour, IHasProgress
         UpdateState();
     }
 
-    public void Initialize(Planet basePlanet)
+    public void Initialize(Planet homePlanet)
     {
-        _basePlanet = basePlanet;
-        _cargoTransferSpeed = _basePlanet.cargoTransferSpeed;
-        _transferTime = _basePlanet.cargoAmount / transferSpeed;
-        SetDestination(_basePlanet);
-        CurrentState = CargoShipState.GoingToBasePlanet;
+        _homePlanet = homePlanet;
+        _travelSpeed = _homePlanet.shipTravelSpeed;
+        _transferTime = _homePlanet.shipCargoTransferTime;
+        SetDestination(_homePlanet);
+        CurrentState = CargoShipState.GoingToHomePlanet;
         // PrintCurrentState();
     }
 
-    public void UpdateState()
+    private void UpdateState()
     {
         if (_isCurrentDestinationNull) return;
         
@@ -62,7 +58,7 @@ public class CargoShip : MonoBehaviour, IHasProgress
 
         switch (CurrentState)
         {
-            case CargoShipState.GoingToBasePlanet:
+            case CargoShipState.GoingToHomePlanet:
                 Move();
                 break;
             case CargoShipState.Loading:
@@ -79,26 +75,22 @@ public class CargoShip : MonoBehaviour, IHasProgress
         }
     }
 
-    private void SetDestination(Planet destinationPlanet)
+    private void SetDestination(BasePlanet destinationPlanet)
     {
         _currentDestinationPlanet = destinationPlanet;
-
-
     }
 
     private void Move()
     {
         HandleSprite();
         
-        float stepMovement = travelSpeed * Time.deltaTime;
+        float stepMovement = _travelSpeed * Time.deltaTime;
+        transform.position = Vector3.MoveTowards(_currentPosition, _currentDestinationPlanet.Position, stepMovement);
 
-        transform.position = Vector3.MoveTowards(_currentPosition, _currentDestinationPlanet.position, stepMovement);
-
-        float distance = Vector3.Distance(_currentPosition, _currentDestinationPlanet.position);
-
+        float distance = Vector3.Distance(_currentPosition, _currentDestinationPlanet.Position);
         if (distance < stoppingDistance)
         {
-            if (_currentDestinationPlanet == _basePlanet)
+            if (_currentDestinationPlanet == _homePlanet)
             {
                 CurrentState = CargoShipState.Loading;
                 // PrintCurrentState();
@@ -111,46 +103,13 @@ public class CargoShip : MonoBehaviour, IHasProgress
         }
     }
 
-    private void HandleSprite()
-    {
-        FlipSpriteVertically();
-        RotateShipTowardsDestination();
-    }
-
-    private void FlipSpriteVertically()
-    {
-        if (_currentPosition.x > _currentDestinationPlanet.position.x) { cargoShipSprite.flipY = true; }
-        else { cargoShipSprite.flipY = false; }
-    }
-
-    private void RotateShipTowardsDestination()
-    {
-        Vector3 direction = (_currentDestinationPlanet.position - _currentPosition).normalized;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.eulerAngles = new Vector3(0, 0, angle);
-    }
-
-    private void AlignShipHorizontally()
-    {
-        if (_currentDestinationPlanet.position.x < _currentPosition.x)
-        {
-            transform.eulerAngles = new Vector3(0, 0, 180);
-            cargoShipSprite.flipY = true;
-        }
-        else
-        {
-            transform.eulerAngles = new Vector3(0, 0, 0);
-            cargoShipSprite.flipY = false;
-        }
-    }
-
     private void TransferCargo()
     {
         AlignShipHorizontally();
 
         _transferTimer += Time.deltaTime;
 
-        if (_transferTimer > _transferTime) { _transferTime = Mathf.Floor(_transferTime); } //Round down the time to avoid problems in the comparison below.
+        if (_transferTimer > _transferTime) { _transferTimer = _transferTime; } //Round the number to avoid inconsistencies in the normalization below.
 
         OnProgressChanged?.Invoke(this, new IHasProgress.OnProgressChangedEventArgs
         {
@@ -168,18 +127,51 @@ public class CargoShip : MonoBehaviour, IHasProgress
             }
             else if (CurrentState == CargoShipState.Unloading)
             {
-                _balanceManager.AddBalance(_basePlanet.cargoAmount);
+                _balanceManager.AddBalance(_homePlanet.shipCargoAmount);
                 ResetTransferTimer();
-                SetDestination(_basePlanet);
-                CurrentState = CargoShipState.GoingToBasePlanet;
+                SetDestination(_homePlanet);
+                CurrentState = CargoShipState.GoingToHomePlanet;
                 // PrintCurrentState();
             }
         }
     }
 
+    private void HandleSprite()
+    {
+        FlipSpriteVertically();
+        RotateShipTowardsDestination();
+    }
+
+    private void FlipSpriteVertically()
+    {
+        if (_currentPosition.x > _currentDestinationPlanet.Position.x) { cargoShipSprite.flipY = true; }
+        else { cargoShipSprite.flipY = false; }
+    }
+
+    private void RotateShipTowardsDestination()
+    {
+        Vector3 direction = (_currentDestinationPlanet.Position - _currentPosition).normalized;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        transform.eulerAngles = new Vector3(0, 0, angle);
+    }
+
+    private void AlignShipHorizontally()
+    {
+        if (_currentDestinationPlanet.Position.x < _currentPosition.x)
+        {
+            transform.eulerAngles = new Vector3(0, 0, 180);
+            cargoShipSprite.flipY = true;
+        }
+        else
+        {
+            transform.eulerAngles = new Vector3(0, 0, 0);
+            cargoShipSprite.flipY = false;
+        }
+    }
+
     private void UpdateTransferTime(float transferTime)
     {
-        _cargoTransferSpeed = transferTime;
+        _transferTime = transferTime;
     }
 
     private void ResetTransferTimer()

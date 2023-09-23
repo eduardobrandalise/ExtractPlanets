@@ -17,12 +17,6 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        Planet newPlanet = planetFactory.CreatePlanet();
-    }
-
-    private void InstantiatePlanet(Planet planet)
-    {
-        // GameObject planetObject = Instantiate(planet, planet.Position, Quaternion.identity);
-        // planetObject.GetComponent<PlanetController>().Initialize(newPlanet);
+        // Planet newPlanet = planetFactory.CreatePlanet();
     }
 }

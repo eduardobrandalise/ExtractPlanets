@@ -94,7 +94,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7735560091943505008}
   m_Layer: 0
-  m_Name: Visuals
+  m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -228,8 +228,8 @@ Transform:
   m_GameObject: {fileID: 6793124125188641148}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.8551, y: 0, z: 0}
-  m_LocalScale: {x: 0.7103, y: 0.7103, z: 0.7103}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7735560091943505008}
@@ -247,12 +247,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31a088ee4994e2a4f85e2a45fa48eb2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cargoShip: {fileID: 4846109370199445139, guid: 8e37a9b655096164ba5145c07dcdcf1e, type: 3}
   Name: 
-  Sprite: {fileID: 0}
-  Position: {x: 0, y: 0, z: 0}
-  TripCost: 0
-  CargoValue: 0
-  cargoTransferTime: 2
+  sprite: {fileID: 0}
+  position: {x: 0, y: 0, z: 0}
+  shipTravelSpeed: 0
+  shipTripCost: 200
+  shipCargoAmount: 210
+  shipCargoTransferTime: 5
 --- !u!58 &3367667581978477483
 CircleCollider2D:
   m_ObjectHideFlags: 0

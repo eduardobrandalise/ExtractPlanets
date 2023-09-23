@@ -1,46 +1,46 @@
-using System;
-using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.Serialization;
 
-[System.Serializable]
-public class Planet : MonoBehaviour
-{
-    public UnityEvent<float> cargoTransferSpeedUpdated;
 
+[System.Serializable]
+public class Planet : BasePlanet, IClickable
+{
+    // public UnityEvent<float> cargoTransferSpeedUpdated;
+
+    [SerializeField] private CargoShip cargoShip;
+    // [SerializeField] private Button updateButton;
     // [SerializeField] private TextMeshProUGUI cargoLoadingTimeDisplay;
     // [SerializeField] private GameObject enabledSprite;
     // [SerializeField] private GameObject disabledSprite;
-    
-    public string Name;
-    public Sprite sprite;
-    public Vector3 position;
-    public float tripCost = 200f;
-    public float cargoAmount = 210f;
-    public float cargoTransferSpeed = 40f;
 
+    public Sprite enabledSprite;
+    public Sprite disabledSprite;
+    public float shipTravelSpeed;
+    public float shipTripCost = 200f;
+    public float shipCargoAmount = 210f;
+    public float shipCargoTransferTime = 5f;
+    
     protected BalanceManager BalanceManager;
-    protected InputManager InputManager;
-    protected TripManager TripManager;
     protected Earth Earth;
-    protected CargoShip CargoShip;
-
-    private CargoShipState _cargoShipState;
-    private bool _isEnabled = false;
-    private bool _isCargoShipNotNull;
-
-    private void Awake()
-    {
-        position = gameObject.transform.position;
-    }
-
-    public virtual void Start()
-    {
-        _isCargoShipNotNull = CargoShip != null;
-        SetupManagers();
-    }
     
+    private CargoShipState _cargoShipState;
+    private UpgradeButton _upgradeButton;
+    private Vector3 _upgradeButtonPositionAnchor;
+    private bool _isEnabled = false;
+
+    public Planet(string name, Vector3 position) : base(name, position)
+    {
+        Name = name;
+        Position = position;
+    }
+
+    public void Start()
+    {
+        SetupManagers();
+
+        Position = transform.position;
+    }
+
     private void Update()
     {
         UpdateAvailability();
@@ -49,26 +49,28 @@ public class Planet : MonoBehaviour
     private void SetupManagers()
     {
         BalanceManager = BalanceManager.Instance;
-        InputManager = InputManager.Instance;
-        TripManager = TripManager.Instance;
         Earth = Earth.Instance;
     }
 
-    public void OnClick()
+    public void Clicked()
     {
         if (!_isEnabled) return;
-        
-        BalanceManager.SubtractBalance(tripCost);
 
-        var cargoShipPrefab = TripManager.prefabListSO.cargoShip.GetComponent<CargoShip>();
-        CargoShip = Instantiate(cargoShipPrefab, Earth.Position, Quaternion.identity);
-        // CargoShip.arrivedAtDestination.AddListener();
-        CargoShip.Initialize(this);
+        BalanceManager.SubtractBalance(shipTripCost);
+
+        InstantiateCargoShip();
+    }
+
+    private void InstantiateCargoShip()
+    {
+        Vector3 earthPosition = Earth.Position;
+        cargoShip = Instantiate(cargoShip, earthPosition, Quaternion.identity);
+        cargoShip.Initialize(this);
     }
 
     private void UpdateAvailability()
     {
-        if (BalanceManager.Balance >= tripCost)
+        if (BalanceManager.Balance >= shipTripCost)
         {
             _isEnabled = true;
             EnablePlanet();
@@ -80,12 +82,17 @@ public class Planet : MonoBehaviour
         }
     }
 
+    private void IncreaseTravelSpeed()
+    {
+        shipTravelSpeed = shipTravelSpeed + 0.4f;
+    }
+
     private void EnablePlanet()
     {
         // enabledSprite.SetActive(true);
         // disabledSprite.SetActive(false);
     }
-    
+
     private void DisablePlanet()
     {
         // enabledSprite.SetActive(false);
