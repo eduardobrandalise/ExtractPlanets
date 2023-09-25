@@ -38,7 +38,7 @@ public class InputManager : MonoBehaviour
     {
         _selectAction.performed -= SelectOnPerformed;
     }
-
+    
     private void SelectOnPerformed(InputAction.CallbackContext obj)
     {
         // Cast a ray from the mouse position into the scene
@@ -51,15 +51,18 @@ public class InputManager : MonoBehaviour
         {
             // The hit.collider variable contains the clicked object's Collider2D
             GameObject selectedObject = hit.collider.gameObject;
-
-            selectedObject.GetComponent<Planet>().Clicked();
-            // You can perform actions on the clicked object here
-            selected.Invoke(selectedObject);
             
+            if (selectedObject.TryGetComponent(out Planet planet))
+            {
+                planet.Clicked();
+                // You can perform actions on the clicked object here
+                selected.Invoke(selectedObject);
+            }
+
             _hudManager.UpdateSelectedObject(selectedObject);
         }
     }
-
+    
     private void EnableInput()
     {
         _playerInputActions.Player.Enable();

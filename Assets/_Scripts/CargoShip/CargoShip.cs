@@ -127,7 +127,7 @@ public class CargoShip : MonoBehaviour, IHasProgress
             }
             else if (CurrentState == CargoShipState.Unloading)
             {
-                _balanceManager.AddBalance(_homePlanet.shipCargoAmount);
+                _balanceManager.AddBalance(_homePlanet.ShipCargoValue);
                 ResetTransferTimer();
                 SetDestination(_homePlanet);
                 CurrentState = CargoShipState.GoingToHomePlanet;

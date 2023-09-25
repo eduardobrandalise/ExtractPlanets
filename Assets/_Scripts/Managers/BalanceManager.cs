@@ -6,12 +6,13 @@ public class BalanceManager : MonoBehaviour
     public static BalanceManager Instance { get { return _instance; } }
 
     [field: SerializeField] public float InitialBalance { get; private set; } = 0f;
-
+    // [field: SerializeField] public float Balance { get; private set; }
+    
+    public BigNumber Balance { get { return _balance; } }
+    private BigNumber _balance = new BigNumber(0,0);
+    
     private HUDManager _hudManager;
-
     private float _timer = 0f;
-
-    [field: SerializeField] public float Balance { get; private set; }
 
     private void Awake()
     {
@@ -21,9 +22,11 @@ public class BalanceManager : MonoBehaviour
 
     private void Start()
     {
+        _balance.Add(new BigNumber(InitialBalance,0));
+        
         _hudManager = HUDManager.Instance;
-        Balance += InitialBalance;
-        _hudManager.UpdateBalanceDisplay(Balance);
+        
+        UpdateBalanceDisplay();
     }
 
     private void FixedUpdate()
@@ -33,16 +36,18 @@ public class BalanceManager : MonoBehaviour
 
     private void UpdateBalanceDisplay()
     {
-        _hudManager.UpdateBalanceDisplay(Balance);
+        _hudManager.UpdateBalanceDisplay(_balance);
     }
 
-    public void AddBalance(float amount)
+    public void AddBalance(BigNumber amount)
     {
-        Balance += amount;
+        _balance.Add(amount);
+        // print(_balance.Value);
+        // print(_balance.Exponent);
     }
     
-    public void SubtractBalance(float amount)
+    public void SubtractBalance(BigNumber amount)
     {
-        Balance -= amount;
+        _balance.Subtract(amount);
     }
 }

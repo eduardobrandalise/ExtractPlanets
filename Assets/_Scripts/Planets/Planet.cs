@@ -16,8 +16,8 @@ public class Planet : BasePlanet, IClickable
     public Sprite enabledSprite;
     public Sprite disabledSprite;
     public float shipTravelSpeed;
-    public float shipTripCost = 200f;
-    public float shipCargoAmount = 210f;
+    public BigNumber ShipTripCost;
+    public BigNumber ShipCargoValue;
     public float shipCargoTransferTime = 5f;
     
     protected BalanceManager BalanceManager;
@@ -27,6 +27,7 @@ public class Planet : BasePlanet, IClickable
     private UpgradeButton _upgradeButton;
     private Vector3 _upgradeButtonPositionAnchor;
     private bool _isEnabled = false;
+    private bool _isCargoShipDeployed;
 
     public Planet(string name, Vector3 position) : base(name, position)
     {
@@ -39,6 +40,8 @@ public class Planet : BasePlanet, IClickable
         SetupManagers();
 
         Position = transform.position;
+        ShipTripCost = new BigNumber(200,0);
+        ShipCargoValue = new BigNumber(999000000, 0);
     }
 
     private void Update()
@@ -54,9 +57,9 @@ public class Planet : BasePlanet, IClickable
 
     public void Clicked()
     {
-        if (!_isEnabled) return;
+        if (!_isEnabled || _isCargoShipDeployed) return;
 
-        BalanceManager.SubtractBalance(shipTripCost);
+        BalanceManager.SubtractBalance(ShipTripCost);
 
         InstantiateCargoShip();
     }
@@ -66,11 +69,12 @@ public class Planet : BasePlanet, IClickable
         Vector3 earthPosition = Earth.Position;
         cargoShip = Instantiate(cargoShip, earthPosition, Quaternion.identity);
         cargoShip.Initialize(this);
+        _isCargoShipDeployed = true;
     }
 
     private void UpdateAvailability()
     {
-        if (BalanceManager.Balance >= shipTripCost)
+        if (BalanceManager.Balance.CompareTo(ShipTripCost) == ComparisonResult.Greater || BalanceManager.Balance.CompareTo(ShipTripCost) == ComparisonResult.Equal)
         {
             _isEnabled = true;
             EnablePlanet();
@@ -80,6 +84,17 @@ public class Planet : BasePlanet, IClickable
             _isEnabled = false;
             DisablePlanet();
         }
+        
+        // if (BalanceManager.Balance >= shipTripCost)
+        // {
+        //     _isEnabled = true;
+        //     EnablePlanet();
+        // }
+        // else
+        // {
+        //     _isEnabled = false;
+        //     DisablePlanet();
+        // }
     }
 
     private void IncreaseTravelSpeed()

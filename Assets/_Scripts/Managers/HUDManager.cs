@@ -21,7 +21,7 @@ public class HUDManager : MonoBehaviour
         selectedObjectDisplay.text = "No object selected.";
     }
 
-    public void UpdateBalanceDisplay(float moneyAmount)
+    public void UpdateBalanceDisplay(BigNumber moneyAmount)
     {
         moneyDisplay.text = moneyAmount.ToString();
     }

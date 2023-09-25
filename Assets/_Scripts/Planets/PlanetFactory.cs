@@ -1,9 +1,10 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 
 public class PlanetFactory : MonoBehaviour
 {
-    public PlanetData planetData;
+    [FormerlySerializedAs("planetData")] public PlanetDataSO planetDataSo;
 
     private List<string> usedNames = new List<string>();
     private List<Sprite> usedSprites = new List<Sprite>();
@@ -15,17 +16,17 @@ public class PlanetFactory : MonoBehaviour
         planet.Name = GetUniqueName();
         planet.enabledSprite = GetUniqueSprite();
         planet.Position = GenerateRandomPosition();
-        planet.shipTripCost = GenerateTripCost(planet.Position);
+        planet.ShipTripCost = GenerateTripCost(planet.Position);
 
         return planet;
     }
 
     private string GetUniqueName()
     {
-        string name = planetData.planetNames[Random.Range(0, planetData.planetNames.Count)];
+        string name = planetDataSo.planetNames[Random.Range(0, planetDataSo.planetNames.Count)];
         while (usedNames.Contains(name))
         {
-            name = planetData.planetNames[Random.Range(0, planetData.planetNames.Count)];
+            name = planetDataSo.planetNames[Random.Range(0, planetDataSo.planetNames.Count)];
         }
         usedNames.Add(name);
         return name;
@@ -33,10 +34,10 @@ public class PlanetFactory : MonoBehaviour
 
     private Sprite GetUniqueSprite()
     {
-        Sprite sprite = planetData.planetSprites[Random.Range(0, planetData.planetSprites.Count)];
+        Sprite sprite = planetDataSo.planetSprites[Random.Range(0, planetDataSo.planetSprites.Count)];
         while (usedSprites.Contains(sprite))
         {
-            sprite = planetData.planetSprites[Random.Range(0, planetData.planetSprites.Count)];
+            sprite = planetDataSo.planetSprites[Random.Range(0, planetDataSo.planetSprites.Count)];
         }
         usedSprites.Add(sprite);
         return sprite;
@@ -66,11 +67,11 @@ public class PlanetFactory : MonoBehaviour
     /// </summary>
     /// <param name="position">Position of the planet being generated.</param>
     /// <returns></returns>
-    private float GenerateTripCost(Vector3 position)
+    private BigNumber GenerateTripCost(Vector3 position)
     {
         float distanceFromEarth = Vector3.Distance(Earth.Instance.Position, position);
         float tripCost = distanceFromEarth;
 
-        return tripCost;
+        return new BigNumber(tripCost);
     }
 }
