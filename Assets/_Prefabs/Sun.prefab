@@ -73,7 +73,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: e79301b9c44a00743bbce9d0cd30e665, type: 3}
+  m_Sprite: {fileID: 21300000, guid: cb03fa983779a6d448e96916bb470907, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -190,7 +190,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: b6d26bded04d57a47a6552628d962e7b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: cb03fa983779a6d448e96916bb470907, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -210,10 +210,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6045452708471354293}
-  - component: {fileID: 4539370013513126414}
+  - component: {fileID: 8668655517053570817}
   - component: {fileID: 3367667581978477483}
   m_Layer: 0
-  m_Name: Planet
+  m_Name: Sun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -235,7 +235,7 @@ Transform:
   - {fileID: 7735560091943505008}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4539370013513126414
+--- !u!114 &8668655517053570817
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -244,15 +244,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6793124125188641148}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31a088ee4994e2a4f85e2a45fa48eb2d, type: 3}
+  m_Script: {fileID: 11500000, guid: 0addea9b26edb9e4a8aed4953c0dcc2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  planetName: 
-  cargoShip: {fileID: 4846109370199445139, guid: 8e37a9b655096164ba5145c07dcdcf1e, type: 3}
-  enabledSpriteRenderer: {fileID: 138569084423858467}
-  disabledSpriteRenderer: {fileID: 7279294377563803548}
-  shipTravelSpeed: 1
-  shipCargoTransferTime: 5
 --- !u!58 &3367667581978477483
 CircleCollider2D:
   m_ObjectHideFlags: 0

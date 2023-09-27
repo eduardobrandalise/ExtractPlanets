@@ -7,14 +7,11 @@ public class Planet : BasePlanet, IClickable
 {
     // public UnityEvent<float> cargoTransferSpeedUpdated;
 
+    [SerializeField] private string planetName;
     [SerializeField] private CargoShip cargoShip;
-    // [SerializeField] private Button updateButton;
-    // [SerializeField] private TextMeshProUGUI cargoLoadingTimeDisplay;
-    // [SerializeField] private GameObject enabledSprite;
-    // [SerializeField] private GameObject disabledSprite;
-
-    public Sprite enabledSprite;
-    public Sprite disabledSprite;
+    [SerializeField] public SpriteRenderer enabledSpriteRenderer;
+    [SerializeField] public SpriteRenderer disabledSpriteRenderer;
+    
     public float shipTravelSpeed;
     public BigNumber ShipTripCost;
     public BigNumber ShipCargoValue;
@@ -39,9 +36,10 @@ public class Planet : BasePlanet, IClickable
     {
         SetupManagers();
 
+        if (Name != planetName) { Name = planetName; }
         Position = transform.position;
         ShipTripCost = new BigNumber(200,0);
-        ShipCargoValue = new BigNumber(999000000, 0);
+        ShipCargoValue = new BigNumber(100, 0);
     }
 
     private void Update()
@@ -57,6 +55,8 @@ public class Planet : BasePlanet, IClickable
 
     public void Clicked()
     {
+        print(BalanceManager.Balance.CompareTo(ShipTripCost));
+        
         if (!_isEnabled || _isCargoShipDeployed) return;
 
         BalanceManager.SubtractBalance(ShipTripCost);
@@ -74,15 +74,13 @@ public class Planet : BasePlanet, IClickable
 
     private void UpdateAvailability()
     {
-        if (BalanceManager.Balance.CompareTo(ShipTripCost) == ComparisonResult.Greater || BalanceManager.Balance.CompareTo(ShipTripCost) == ComparisonResult.Equal)
+        if (BalanceManager.Balance.CompareTo(ShipTripCost) == ComparisonResult.Less)
         {
-            _isEnabled = true;
-            EnablePlanet();
+            DisablePlanet();
         }
         else
         {
-            _isEnabled = false;
-            DisablePlanet();
+            EnablePlanet();
         }
         
         // if (BalanceManager.Balance >= shipTripCost)
@@ -104,13 +102,21 @@ public class Planet : BasePlanet, IClickable
 
     private void EnablePlanet()
     {
-        // enabledSprite.SetActive(true);
-        // disabledSprite.SetActive(false);
+        _isEnabled = true;
+        
+        enabledSpriteRenderer.gameObject.SetActive(true);
+        disabledSpriteRenderer.gameObject.SetActive(false);
+        // enabledSpriteRenderer.enabled = true;
+        // disabledSpriteRenderer.enabled = false;
     }
 
     private void DisablePlanet()
     {
-        // enabledSprite.SetActive(false);
-        // disabledSprite.SetActive(true);
+        _isEnabled = false;
+        
+        enabledSpriteRenderer.gameObject.SetActive(false);
+        disabledSpriteRenderer.gameObject.SetActive(true);
+        // enabledSpriteRenderer.enabled = false;
+        // disabledSpriteRenderer.enabled = true;
     }
 }

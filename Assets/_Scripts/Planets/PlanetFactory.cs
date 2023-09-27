@@ -14,7 +14,7 @@ public class PlanetFactory : MonoBehaviour
         Planet planet = gameObject.AddComponent<Planet>();
 
         planet.Name = GetUniqueName();
-        planet.enabledSprite = GetUniqueSprite();
+        planet.enabledSpriteRenderer.sprite = GetUniqueSprite();
         planet.Position = GenerateRandomPosition();
         planet.ShipTripCost = GenerateTripCost(planet.Position);
 

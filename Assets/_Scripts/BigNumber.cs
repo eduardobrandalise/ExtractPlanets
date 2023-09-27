@@ -18,6 +18,7 @@ public class BigNumber
         this.Value = value;
         this.Exponent = exponent;
         
+        //TODO: calling Normalize() may work like the constructor below that accepts only a double. Test its efficacy. 
         // Normalize();
     }
     
@@ -134,11 +135,11 @@ public class BigNumber
             other.Align(this.Exponent);
         }
 
-        if (this.Exponent > other.Exponent)
+        if (this.Value > other.Value)
         {
             return ComparisonResult.Greater;
         }
-        else if (this.Exponent < other.Exponent)
+        else if (this.Value < other.Value)
         {
             return ComparisonResult.Less;
         }
@@ -147,6 +148,31 @@ public class BigNumber
             return ComparisonResult.Equal;
         }
     }
+    
+    // public ComparisonResult CompareTo(BigNumber other)
+    // {
+    //     if (this.Exponent < other.Exponent)
+    //     {
+    //         this.Align(other.Exponent);
+    //     }
+    //     else if (this.Exponent > other.Exponent)
+    //     {
+    //         other.Align(this.Exponent);
+    //     }
+    //
+    //     if (this.Exponent > other.Exponent)
+    //     {
+    //         return ComparisonResult.Greater;
+    //     }
+    //     else if (this.Exponent < other.Exponent)
+    //     {
+    //         return ComparisonResult.Less;
+    //     }
+    //     else
+    //     {
+    //         return ComparisonResult.Equal;
+    //     }
+    // }
     
     // public bool IsGreaterThan(BigNumber other)
     // {
