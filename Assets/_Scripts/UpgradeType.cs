@@ -1,0 +1,5 @@
+enum UpgradeType
+{
+    TravelSpeed,
+    TransferTime
+}

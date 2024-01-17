@@ -1,17 +1,17 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 public class InputManager : MonoBehaviour
 {
     private static InputManager instance;
     public static InputManager Instance { get { return instance; } }
 
-    public UnityEvent<GameObject> selected;
-    
+    public UnityEvent<GameObject> objectSelected;
+
     private PlayerInputActions _playerInputActions;
     private Camera _camera;
-    private HUDManager _hudManager;
     private InputAction _selectAction;
 
     private void Awake()
@@ -30,7 +30,6 @@ public class InputManager : MonoBehaviour
     private void Start()
     {
         _camera = Camera.main;
-        _hudManager = HUDManager.Instance;
         _selectAction = _playerInputActions.Player.Select;
     }
 
@@ -51,15 +50,8 @@ public class InputManager : MonoBehaviour
         {
             // The hit.collider variable contains the clicked object's Collider2D
             GameObject selectedObject = hit.collider.gameObject;
-            
-            if (selectedObject.TryGetComponent(out Planet planet))
-            {
-                planet.Clicked();
-                // You can perform actions on the clicked object here
-                selected.Invoke(selectedObject);
-            }
 
-            _hudManager.UpdateSelectedObject(selectedObject);
+            objectSelected.Invoke(selectedObject);
         }
     }
     

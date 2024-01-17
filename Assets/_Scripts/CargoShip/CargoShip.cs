@@ -43,11 +43,10 @@ public class CargoShip : MonoBehaviour, IHasProgress
     public void Initialize(Planet homePlanet)
     {
         _homePlanet = homePlanet;
-        _travelSpeed = _homePlanet.shipTravelSpeed;
-        _transferTime = _homePlanet.shipCargoTransferTime;
+        _travelSpeed = _homePlanet.travelSpeed;
+        _transferTime = _homePlanet.transferTime;
         SetDestination(_homePlanet);
         CurrentState = CargoShipState.GoingToHomePlanet;
-        // PrintCurrentState();
     }
 
     private void UpdateState()

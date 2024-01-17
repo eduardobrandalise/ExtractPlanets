@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 
 public class PlanetFactory : MonoBehaviour
 {
-    [FormerlySerializedAs("planetData")] public PlanetDataSO planetDataSo;
+    public PlanetDataSO planetDataSo;
 
     private List<string> usedNames = new List<string>();
     private List<Sprite> usedSprites = new List<Sprite>();

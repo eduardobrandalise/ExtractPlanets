@@ -1,30 +1,41 @@
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Serialization;
 
 
 [System.Serializable]
 public class Planet : BasePlanet, IClickable
 {
-    // public UnityEvent<float> cargoTransferSpeedUpdated;
+    public UnityEvent<Planet> clicked;
+    public UnityEvent upgradeApplied;
 
     [SerializeField] private string planetName;
     [SerializeField] private CargoShip cargoShip;
     [SerializeField] public SpriteRenderer enabledSpriteRenderer;
     [SerializeField] public SpriteRenderer disabledSpriteRenderer;
-    
-    public float shipTravelSpeed;
-    public BigNumber ShipTripCost;
-    public BigNumber ShipCargoValue;
-    public float shipCargoTransferTime = 5f;
-    
+
+
+    protected PlanetManager PlanetManager;
     protected BalanceManager BalanceManager;
     protected Earth Earth;
-    
-    private CargoShipState _cargoShipState;
-    private UpgradeButton _upgradeButton;
-    private Vector3 _upgradeButtonPositionAnchor;
+
     private bool _isEnabled = false;
     private bool _isCargoShipDeployed;
+
+    public BigNumber ShipTripCost;
+    public BigNumber ShipCargoValue;
+    public float travelSpeed = 1f;
+    public float transferTime = 5f;
+    private int _travelSpeedLevel = 1;
+    private int _transferTimeLevel = 1;
+    private float _travelSpeedRateGrowth = 1.06f;
+    private float _transferTimeRateGrowth = 1.02f;
+    private BigNumber _travelSpeedUpgradeBaseCost = new BigNumber(40,0);
+    private BigNumber _transferTimeUpgradeBaseCost = new BigNumber(80,0);
+    public BigNumber _travelSpeedUpgradeCurrentCost;
+    public BigNumber _transferTimeUpgradeCurrentCost;
+    public float travelSpeedMultiplier = 1f;
+    public float transferTimeMultiplier = 1f;
 
     public Planet(string name, Vector3 position) : base(name, position)
     {
@@ -34,12 +45,20 @@ public class Planet : BasePlanet, IClickable
 
     public void Start()
     {
-        SetupManagers();
+        SaveReferencesToManagers();
 
         if (Name != planetName) { Name = planetName; }
         Position = transform.position;
         ShipTripCost = new BigNumber(200,0);
-        ShipCargoValue = new BigNumber(100, 0);
+        ShipCargoValue = new BigNumber(500000000000, 0);
+
+        _travelSpeedUpgradeBaseCost = new BigNumber(40, 0);
+        _transferTimeUpgradeBaseCost = new BigNumber(80, 0);
+
+        _travelSpeedUpgradeCurrentCost = _travelSpeedUpgradeBaseCost;
+        _transferTimeUpgradeCurrentCost = _transferTimeUpgradeBaseCost;        
+
+        PlanetManager.RegisterPlanet(this);
     }
 
     private void Update()
@@ -47,8 +66,9 @@ public class Planet : BasePlanet, IClickable
         UpdateAvailability();
     }
 
-    private void SetupManagers()
+    private void SaveReferencesToManagers()
     {
+        PlanetManager = PlanetManager.Instance;
         BalanceManager = BalanceManager.Instance;
         Earth = Earth.Instance;
     }
@@ -57,6 +77,8 @@ public class Planet : BasePlanet, IClickable
     {
         print(BalanceManager.Balance.CompareTo(ShipTripCost));
         
+        clicked.Invoke(this);
+
         if (!_isEnabled || _isCargoShipDeployed) return;
 
         BalanceManager.SubtractBalance(ShipTripCost);
@@ -82,22 +104,69 @@ public class Planet : BasePlanet, IClickable
         {
             EnablePlanet();
         }
-        
-        // if (BalanceManager.Balance >= shipTripCost)
-        // {
-        //     _isEnabled = true;
-        //     EnablePlanet();
-        // }
-        // else
-        // {
-        //     _isEnabled = false;
-        //     DisablePlanet();
-        // }
+    }
+
+    public void UpgradeTravelSpeed()
+    {
+        _travelSpeedLevel++;
+        BalanceManager.SubtractBalance(_travelSpeedUpgradeCurrentCost);
+        CalculateProduction(UpgradeType.TravelSpeed);
+        CalculateNextLevelCost(UpgradeType.TravelSpeed);
+        print(_travelSpeedLevel);
+    }
+
+    public void UpgradeTransferTime()
+    {
+        _transferTimeLevel++;
+        BalanceManager.SubtractBalance(_transferTimeUpgradeCurrentCost);
+        CalculateProduction(UpgradeType.TransferTime);
+        CalculateNextLevelCost(UpgradeType.TransferTime);
+        print(_transferTimeLevel);
+    }
+
+    private void FireUpgradeAppliedEvent()
+    {
+        upgradeApplied.Invoke();
     }
 
     private void IncreaseTravelSpeed()
     {
-        shipTravelSpeed = shipTravelSpeed + 0.4f;
+        travelSpeed = travelSpeed + 0.4f;
+    }
+    
+    private void CalculateNextLevelCost(UpgradeType upgradeType)
+    {
+        double multiplier;
+        BigNumber baseCost;
+        
+        switch (upgradeType)
+        {
+            case UpgradeType.TravelSpeed:
+                baseCost = _travelSpeedUpgradeBaseCost;
+                multiplier = Mathf.Pow(_travelSpeedRateGrowth,_travelSpeedLevel);
+                baseCost.Multiply(multiplier);
+                _transferTimeUpgradeCurrentCost = baseCost;
+                break;
+            case UpgradeType.TransferTime:
+                baseCost = _transferTimeUpgradeBaseCost;
+                multiplier = Mathf.Pow(_transferTimeRateGrowth, _transferTimeLevel);
+                baseCost.Multiply(multiplier);
+                _transferTimeUpgradeCurrentCost = baseCost;
+                break;
+        }
+    }
+
+    private void CalculateProduction(UpgradeType upgradeType)
+    {
+        switch (upgradeType)
+        {
+            case UpgradeType.TravelSpeed:
+                travelSpeed = (travelSpeed * _travelSpeedLevel) * travelSpeedMultiplier;               
+                break;
+            case UpgradeType.TransferTime:
+                transferTime = (transferTime * _transferTimeLevel) * transferTimeMultiplier;                
+                break;
+        }
     }
 
     private void EnablePlanet()
@@ -106,8 +175,6 @@ public class Planet : BasePlanet, IClickable
         
         enabledSpriteRenderer.gameObject.SetActive(true);
         disabledSpriteRenderer.gameObject.SetActive(false);
-        // enabledSpriteRenderer.enabled = true;
-        // disabledSpriteRenderer.enabled = false;
     }
 
     private void DisablePlanet()
@@ -116,7 +183,5 @@ public class Planet : BasePlanet, IClickable
         
         enabledSpriteRenderer.gameObject.SetActive(false);
         disabledSpriteRenderer.gameObject.SetActive(true);
-        // enabledSpriteRenderer.enabled = false;
-        // disabledSpriteRenderer.enabled = true;
     }
 }

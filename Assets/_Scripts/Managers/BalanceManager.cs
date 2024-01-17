@@ -12,7 +12,6 @@ public class BalanceManager : MonoBehaviour
     private BigNumber _balance = new BigNumber(0,0);
     
     private HUDManager _hudManager;
-    private float _timer = 0f;
 
     private void Awake()
     {

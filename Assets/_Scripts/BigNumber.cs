@@ -9,7 +9,7 @@ public class BigNumber
     public int Exponent { get; set; }
 
     private const int MaxMagnitude = 12; // Max power magnitude diff for operands.
-    //TODO: Check if the constant TenCube works with this notation.
+    //TODO: Check if the constant TenCube works with this engineering notation.
     private const double TenCubed = 1e3; // Used for normalizing numbers.
     
     // Constructor
@@ -62,7 +62,7 @@ public class BigNumber
         }
     }
 
-    // Compute the equivalent number at 1Eexp (note: assumes exp is greater than this.Exp).
+    // Compute the equivalent number at 1Exp (note: assumes exp is greater than this.Exp).
     public void Align(int exponent)
     {
         int d = exponent - this.Exponent;
@@ -148,47 +148,12 @@ public class BigNumber
             return ComparisonResult.Equal;
         }
     }
-    
-    // public ComparisonResult CompareTo(BigNumber other)
-    // {
-    //     if (this.Exponent < other.Exponent)
-    //     {
-    //         this.Align(other.Exponent);
-    //     }
-    //     else if (this.Exponent > other.Exponent)
-    //     {
-    //         other.Align(this.Exponent);
-    //     }
-    //
-    //     if (this.Exponent > other.Exponent)
-    //     {
-    //         return ComparisonResult.Greater;
-    //     }
-    //     else if (this.Exponent < other.Exponent)
-    //     {
-    //         return ComparisonResult.Less;
-    //     }
-    //     else
-    //     {
-    //         return ComparisonResult.Equal;
-    //     }
-    // }
-    
-    // public bool IsGreaterThan(BigNumber other)
-    // {
-    //     if (this.Exponent < other.Exponent)
-    //     {
-    //         this.Align(other.Exponent);
-    //     }
-    //     else if (this.Exponent > other.Exponent)
-    //     {
-    //         other.Align(this.Exponent);
-    //     }
-    //
-    //     return this.Value > other.Value;
-    // }
 
-    // GetValue. Return the number value as a string.
+    /// <summary>
+    /// Return the number as string.
+    /// </summary>
+    /// <param name="precision">Number of decimals shown in the number.</param>
+    /// <returns>The value of the number as a string.</returns>
     public string GetValue(int precision = 3)
     {
         return this.Value.ToString($"F{precision}");
